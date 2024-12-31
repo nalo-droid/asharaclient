@@ -38,61 +38,58 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Hero Section */}
+      {/* Hero Section - Scaled down height */}
       <section className="relative bg-white">
-        {/* Hero Images */}
-        <div className="absolute inset-0 z-0">
+        {/* Hero Images Container - Reduced height */}
+        <div className="absolute inset-0 w-full h-[400px] md:h-[500px] overflow-hidden">
           <img
             src={heroImages[currentImageIndex].url}
             alt={heroImages[currentImageIndex].alt}
-            className={`absolute w-full h-full object-cover transition-opacity duration-1000 ${
-              isTransitioning ? 'opacity-0' : 'opacity-100'
-            }`}
+            className="w-full h-full object-cover transition-opacity duration-1000"
+            style={{ opacity: isTransitioning ? 0 : 1 }}
           />
-          <img
-            src={heroImages[nextImageIndex].url}
-            alt={heroImages[nextImageIndex].alt}
-            className={`absolute w-full h-full object-cover transition-opacity duration-1000 ${
-              isTransitioning ? 'opacity-100' : 'opacity-0'
-            }`}
-          />
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-black/40" />
         </div>
 
-        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 max-w-7xl">
-          <div className="text-center max-w-4xl mx-auto">
-            <div className="flex justify-center mb-8">
-              <MdFingerprint className="h-16 w-16 text-blue-600" />
-            </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
-              Welcome to Ashara Building Design
-            </h1>
-            <p className="text-lg sm:text-xl text-gray-100 mb-10 max-w-2xl mx-auto">
-              Transform your architectural vision into reality with our cutting-edge design solutions
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link
-                to="/register"
-                className="w-full sm:w-auto bg-gray-800 text-white px-8 py-4 rounded-lg hover:bg-gray-900 transition-colors text-center min-w-[200px]"
-              >
-                Get Started
-              </Link>
+        {/* Content Container - Adjusted height to match */}
+        <div className="container-xl mx-auto relative z-10">
+          <div className="flex flex-col items-center justify-center min-h-[400px] md:min-h-[500px] px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">
+                Design Your Dream Space
+              </h1>
+              <p className="text-sm sm:text-base text-white/90 mb-6 max-w-xl mx-auto">
+                Transform your vision into reality with our innovative architectural design platform
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <Link
+                  to="/register"
+                  className="w-full sm:w-auto bg-white text-blue-600 px-6 py-3 rounded-lg hover:bg-gray-100 transition-colors min-w-[160px]"
+                >
+                  Get Started
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-16 lg:py-24 bg-gray-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center text-gray-800 mb-12">
-            Our Services
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      {/* Features Section - Adjusted padding */}
+      <section className="py-12 lg:py-16 bg-white">
+        <div className="container-xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3">
+              Our Services
+            </h2>
+            <p className="text-base text-gray-600">
+              Comprehensive architectural design solutions for your needs
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {/* Feature cards - Scaled down */}
             <FeatureCard
               title="Custom Designs"
-              description="Create your perfect space with our customizable design templates"
+              description="Tailored architectural solutions for your specific needs"
               icon="🏠"
             />
             <FeatureCard
@@ -109,19 +106,19 @@ const Home = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="bg-blue-600 py-16 lg:py-24">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <div className="text-center max-w-3xl mx-auto">
-            <h2 className="text-3xl sm:text-4xl text-white font-bold mb-6">
+      {/* CTA Section - Adjusted padding */}
+      <section className="bg-blue-600 py-12 lg:py-16">
+        <div className="container-xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl text-white font-bold mb-4">
               Ready to Start Your Project?
             </h2>
-            <p className="text-white/90 mb-10 text-lg">
+            <p className="text-white/90 mb-8 text-base">
               Join us today and bring your architectural dreams to life
             </p>
             <Link
               to="/register"
-              className="inline-block bg-white text-blue-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors min-w-[200px]"
+              className="inline-block bg-white text-blue-600 px-6 py-3 rounded-lg hover:bg-gray-100 transition-colors min-w-[160px]"
             >
               Create Account
             </Link>
@@ -134,10 +131,10 @@ const Home = () => {
 
 const FeatureCard = ({ title, description, icon }) => {
   return (
-    <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center">
-      <div className="text-5xl mb-6 flex justify-center">{icon}</div>
-      <h3 className="text-2xl font-semibold text-gray-800 mb-4">{title}</h3>
-      <p className="text-gray-600 text-lg">{description}</p>
+    <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center">
+      <div className="text-4xl mb-4 flex justify-center">{icon}</div>
+      <h3 className="text-xl font-semibold text-gray-800 mb-3">{title}</h3>
+      <p className="text-gray-600 text-base">{description}</p>
     </div>
   );
 };

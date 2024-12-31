@@ -8,13 +8,15 @@ import Services from './pages/public/Services'
 import Software from './pages/public/Software'
 import Dashboard from './pages/client/Dashboard'
 import DesignCatalog from './pages/client/DesignCatalog'
-import CustomizeDesign from './pages/client/CustomizeDesign'
+import RequestDesign from './pages/client/RequestDesign'
 import OrderHistory from './pages/client/OrderHistory'
 import Profile from './pages/client/Profile'
 import Footer from './components/Footer'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import ManageDesigns from './pages/admin/ManageDesigns'
 import ManageUsers from './pages/admin/ManageUsers'
+import ManageDesignCatalog from './pages/admin/ManageDesignCatalog'
+import CreateDesign from './pages/admin/CreateDesign'
 
 function App() {
   const user = JSON.parse(localStorage.getItem('user'));
@@ -23,6 +25,17 @@ function App() {
   // Helper function to check role
   const hasRole = (requiredRole) => {
     return isAuthenticated && user.role === requiredRole;
+  };
+
+  // Helper function to protect routes
+  const ProtectedRoute = ({ element, requiredRole }) => {
+    if (!isAuthenticated) {
+      return <Navigate to="/login" />;
+    }
+    if (requiredRole && user.role !== requiredRole) {
+      return <Navigate to="/" />;
+    }
+    return element;
   };
 
   return (
@@ -43,29 +56,41 @@ function App() {
             {/* Client Routes */}
             <Route
               path="/client/dashboard"
-              element={hasRole('client') ? <Dashboard /> : <Navigate to="/login" />}
+              element={<ProtectedRoute element={<Dashboard />} requiredRole="client" />}
             />
             <Route
-              path="/customize/:designId"
-              element={hasRole('client') ? <CustomizeDesign /> : <Navigate to="/login" />}
+              path="/request-design"
+              element={<ProtectedRoute element={<RequestDesign />} requiredRole="client" />}
             />
             <Route
               path="/orders"
-              element={hasRole('client') ? <OrderHistory /> : <Navigate to="/login" />}
+              element={<ProtectedRoute element={<OrderHistory />} requiredRole="client" />}
+            />
+            <Route
+              path="/profile"
+              element={<ProtectedRoute element={<Profile />} requiredRole="client" />}
             />
 
             {/* Admin Routes */}
             <Route
               path="/admin/dashboard"
-              element={hasRole('admin') ? <AdminDashboard /> : <Navigate to="/login" />}
+              element={<ProtectedRoute element={<AdminDashboard />} requiredRole="admin" />}
             />
             <Route
               path="/admin/manage-designs"
-              element={hasRole('admin') ? <ManageDesigns /> : <Navigate to="/login" />}
+              element={<ProtectedRoute element={<ManageDesigns />} requiredRole="admin" />}
+            />
+            <Route
+              path="/admin/design-catalog"
+              element={<ProtectedRoute element={<ManageDesignCatalog />} requiredRole="admin" />}
+            />
+            <Route
+              path="/admin/create-design"
+              element={<ProtectedRoute element={<CreateDesign />} requiredRole="admin" />}
             />
             <Route
               path="/admin/manage-users"
-              element={hasRole('admin') ? <ManageUsers /> : <Navigate to="/login" />}
+              element={<ProtectedRoute element={<ManageUsers />} requiredRole="admin" />}
             />
 
             {/* Catch all route */}

@@ -28,7 +28,8 @@ function AdminNavbar() {
 
   const handleLogout = () => {
     localStorage.removeItem('user');
-    navigate('/login');
+    localStorage.removeItem('token');
+    navigate('/');
   };
 
   return (
@@ -44,7 +45,13 @@ function AdminNavbar() {
                 Dashboard
               </Link>
               <Link to="/admin/manage-designs" className={navLinkClasses('/admin/manage-designs')}>
-                Manage Designs
+                Design Requests
+              </Link>
+              <Link to="/admin/design-catalog" className={navLinkClasses('/admin/design-catalog')}>
+                Design Catalog
+              </Link>
+              <Link to="/admin/create-design" className={navLinkClasses('/admin/create-design')}>
+                Create Design
               </Link>
               <Link to="/admin/manage-users" className={navLinkClasses('/admin/manage-users')}>
                 Manage Users
@@ -119,7 +126,21 @@ function AdminNavbar() {
               className={mobileNavLinkClasses('/admin/manage-designs')}
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Manage Designs
+              Design Requests
+            </Link>
+            <Link
+              to="/admin/design-catalog"
+              className={mobileNavLinkClasses('/admin/design-catalog')}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Design Catalog
+            </Link>
+            <Link
+              to="/admin/create-design"
+              className={mobileNavLinkClasses('/admin/create-design')}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Create Design
             </Link>
             <Link
               to="/admin/manage-users"

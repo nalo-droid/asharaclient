@@ -28,6 +28,9 @@ a:hover {
 
 body {
   margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
   display: flex;
   place-items: center;
   min-width: 320px;
@@ -69,4 +72,56 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+/* Add these container utilities */
+.container-xl {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+/* Small devices (tablets) */
+@media (min-width: 640px) {
+  .container-xl {
+    padding: 0 2rem;
+  }
+}
+
+/* Medium devices (laptops) */
+@media (min-width: 1024px) {
+  .container-xl {
+    padding: 0 4rem;
+    max-width: 1280px;
+  }
+}
+
+/* Large devices (desktops) */
+@media (min-width: 1280px) {
+  .container-xl {
+    padding: 0 6rem;
+    max-width: 1536px;
+  }
+}
+
+/* Extra large devices */
+@media (min-width: 1536px) {
+  .container-xl {
+    padding: 0 8rem;
+    max-width: 1920px;
+  }
+}
+
+/* Ensure proper box sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Main content wrapper */
+#root {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }

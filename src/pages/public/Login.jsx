@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { MdFingerprint } from 'react-icons/md';
-import { testUsers } from '../../utils/testUsers';
+import apiUrl from '../../utils/apiUrl';
 
-function Login() {
-  const navigate = useNavigate();
+function Login() { 
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -18,65 +18,65 @@ function Login() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
 
-    // Find user in testUsers
-    const user = testUsers.find(
-      user => user.email === formData.email && user.password === formData.password
-    );
+    try {
+      const response = await fetch(`${apiUrl}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-    if (user) {
-      // Store user info in localStorage
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      // Store token and user info
+      localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify({
-        name: user.name,
-        email: user.email,
-        role: user.role
+        name: data.name,
+        email: data.email,
+        role: data.role
       }));
 
-      // Custom event to notify NavbarController
+      // Notify NavbarController
       window.dispatchEvent(new Event('storage'));
 
       // Redirect based on role
-      if (user.role === 'admin') {
-        navigate('/admin/dashboard');
-      } else if (user.role === 'client') {
-        navigate('/client/dashboard');
+      if (data.role === 'admin') { 
+        window.location.href = '/admin/dashboard';
+      } else {
+        window.location.href = '/client/dashboard';
       }
-    } else {
-      setError('Invalid email or password');
-    }
-  };
-
-  // For debugging - remove in production
-  const loginAsTestUser = (role) => {
-    const testUser = testUsers.find(user => user.role === role);
-    if (testUser) {
-      setFormData({
-        email: testUser.email,
-        password: testUser.password
-      });
+    } catch (err) {
+      setError(err.message || 'Login failed');
+      console.error('Login error:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <div className="flex justify-center">
-            <MdFingerprint className="h-12 w-12 text-blue-600" />
-          </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="w-full max-w-md space-y-8">
+        <div className="text-center">
+          <Link to="/" className="flex justify-center items-center text-3xl font-bold text-blue-600">
+            <MdFingerprint className="mr-2" />
+            <span className="text-xl sm:text-2xl">ArchVision</span>
+          </Link>
+          <h2 className="mt-6 text-xl sm:text-3xl font-extrabold text-gray-900">
             Sign in to your account
           </h2>
-          {error && (
-            <p className="mt-2 text-center text-sm text-red-600">
-              {error}
-            </p>
-          )}
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        
+        <form className="mt-8 space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="email" className="sr-only">Email address</label>
@@ -109,30 +109,21 @@ function Login() {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              disabled={isLoading}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              Sign in
+              {isLoading ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
         </form>
 
-        {/* Test Credentials */}
-        <div className="mt-4 text-sm text-gray-600">
-          <p className="font-semibold">Test Credentials:</p>
-          <div className="mt-2 space-y-2">
-            <button
-              onClick={() => loginAsTestUser('client')}
-              className="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
-            >
-              Client: client@test.com / client123
-            </button>
-            <button
-              onClick={() => loginAsTestUser('admin')}
-              className="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
-            >
-              Admin: admin@test.com / admin123
-            </button>
-          </div>
+        <div className="text-center mt-4">
+          <p className="text-sm text-gray-600">
+            Don't have an account?{' '}
+            <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
+              Register here
+            </Link>
+          </p>
         </div>
       </div>
     </div>

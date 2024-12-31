@@ -1,35 +1,29 @@
-import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import PublicNavbar from './PublicNavbar';
-import ClientNavbar from './ClientNavbar';
 import AdminNavbar from './AdminNavbar';
+import ClientNavbar from './ClientNavbar';
 
 function NavbarController() {
-  const [userRole, setUserRole] = useState(null);
+  const location = useLocation();
+  const user = JSON.parse(localStorage.getItem('user'));
 
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    setUserRole(user?.role || 'public');
-  }, []);
-
-  // Listen for changes in localStorage
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const user = JSON.parse(localStorage.getItem('user'));
-      setUserRole(user?.role || 'public');
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
-
-  switch (userRole) {
-    case 'admin':
-      return <AdminNavbar />;
-    case 'client':
-      return <ClientNavbar />;
-    default:
-      return <PublicNavbar />;
+  // Don't show navbar on login and register pages
+  if (location.pathname === '/login' || location.pathname === '/register') {
+    return null;
   }
+
+  // Show admin navbar for admin users
+  if (user?.role === 'admin') {
+    return <AdminNavbar />;
+  }
+
+  // Show client navbar for logged-in clients
+  if (user?.role === 'client') {
+    return <ClientNavbar />;
+  }
+
+  // Show public navbar for non-logged in users
+  return <PublicNavbar />;
 }
 
 export default NavbarController; 

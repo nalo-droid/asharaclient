@@ -28,7 +28,8 @@ function ClientNavbar() {
 
   const handleLogout = () => {
     localStorage.removeItem('user');
-    navigate('/login');
+    localStorage.removeItem('token');
+    navigate('/');
   };
 
   return (
@@ -45,6 +46,9 @@ function ClientNavbar() {
               </Link>
               <Link to="/designcatalog" className={navLinkClasses('/designcatalog')}>
                 Design Catalog
+              </Link>
+              <Link to="/request-design" className={navLinkClasses('/request-design')}>
+                Request Design
               </Link>
               <Link to="/orders" className={navLinkClasses('/orders')}>
                 My Orders
@@ -130,6 +134,13 @@ function ClientNavbar() {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Design Catalog
+            </Link>
+            <Link
+              to="/request-design"
+              className={mobileNavLinkClasses('/request-design')}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Request Design
             </Link>
             <Link
               to="/orders"

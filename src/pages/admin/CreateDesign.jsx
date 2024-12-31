@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import apiUrl from '../../utils/apiUrl';
 
 function CreateDesign() {
   const navigate = useNavigate();
@@ -35,12 +36,44 @@ function CreateDesign() {
     setPreviewImages(prevUrls => [...prevUrls, ...newPreviewUrls]);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
-    console.log('Form submitted:', formData);
-    // Redirect to manage designs page
-    navigate('/admin/manage-designs');
+    
+    try {
+      const formDataToSend = new FormData();
+      
+      // Append text fields
+      Object.keys(formData).forEach(key => {
+        if (key !== 'images') {
+          formDataToSend.append(key, formData[key]);
+        }
+      });
+      
+      // Append images
+      formData.images.forEach(image => {
+        formDataToSend.append('images', image);
+      });
+
+      const response = await fetch(`${apiUrl}/api/designs`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: formDataToSend
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to create design');
+      }
+
+      // Redirect to manage designs page on success
+      navigate('/admin/manage-designs');
+    } catch (error) {
+      console.error('Error creating design:', error);
+      // Handle error (you might want to show an error message to the user)
+    }
   };
 
   return (

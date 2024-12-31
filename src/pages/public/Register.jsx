@@ -1,16 +1,18 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { MdFingerprint } from 'react-icons/md';
+import apiUrl from '../../utils/apiUrl';
 
 const Register = () => {
   const navigate = useNavigate();
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: ''
   });
-
+  console.log(apiUrl)
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -20,11 +22,36 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
     try {
-      // Add your registration logic here
+      const response = await fetch(`${apiUrl}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Registration failed');
+      }
+
+      localStorage.setItem('token', data.token);
       navigate('/login');
     } catch (err) {
-      console.error('Registration failed');
+      setError(err.message || 'Registration failed');
     }
   };
 
@@ -121,6 +148,12 @@ const Register = () => {
                   </p>
                 </div>
               </div>
+
+              {error && (
+                <div className="mb-4 text-red-600 text-sm text-center">
+                  {error}
+                </div>
+              )}
             </div>
           </div>
         </div>

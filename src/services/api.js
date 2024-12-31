@@ -1,7 +1,8 @@
 import axios from 'axios';
+import apiUrl from '../utils/apiUrl';
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: {apiUrl},
 });
 
 // Add auth token to requests
@@ -24,7 +25,7 @@ api.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}/auth/refresh-token`, {
+        const response = await axios.post(`${apiUrl}/auth/refresh-token`, {
           refreshToken,
         });
 
