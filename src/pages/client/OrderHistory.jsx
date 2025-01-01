@@ -15,20 +15,26 @@ function OrderHistory() {
 
   const fetchRequests = async () => {
     try {
+      console.log('Fetching requests for client...');
       const response = await fetch(`${apiUrl}/api/design-requests/my-requests`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
 
+      console.log('Response status:', response.status);
       const data = await response.json();
+      console.log('Received data:', data);
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to fetch requests');
       }
 
-      setRequests(data.data);
+      setRequests(data || []);
     } catch (error) {
+      console.error('Error in fetchRequests:', error);
       setError(error.message);
+      setRequests([]);
     } finally {
       setLoading(false);
     }
@@ -70,7 +76,7 @@ function OrderHistory() {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6">Design Requests History</h1>
 
-        {requests.length === 0 ? (
+        {!requests || requests.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
             <p className="text-gray-600 text-center">No requests found</p>
           </div>

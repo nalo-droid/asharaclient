@@ -16,20 +16,26 @@ const ManageDesigns = () => {
 
   const fetchDesignRequests = async () => {
     try {
+      console.log('Fetching requests for admin...');
       const response = await fetch(`${apiUrl}/api/design-requests/admin/requests`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
 
+      console.log('Response status:', response.status);
       const data = await response.json();
+      console.log('Received data:', data);
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to fetch design requests');
       }
 
-      setRequests(data.data);
+      setRequests(data || []);
     } catch (error) {
+      console.error('Error in fetchDesignRequests:', error);
       setError(error.message);
+      setRequests([]);
     } finally {
       setLoading(false);
     }
@@ -103,74 +109,80 @@ const ManageDesigns = () => {
           <div className="bg-white rounded-lg shadow">
             <div className="overflow-x-auto">
               <div className="inline-block min-w-full align-middle px-2 sm:px-4">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Client Details
-                      </th>
-                      <th className="hidden sm:table-cell px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Design Type
-                      </th>
-                      <th className="hidden md:table-cell px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Plot Area
-                      </th>
-                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {requests.map((request) => (
-                      <tr key={request._id}>
-                        <td className="px-3 sm:px-6 py-4">
-                          <div className="text-sm font-medium text-gray-900">{request.fullName}</div>
-                          <div className="text-sm text-gray-500">{request.contactNumber}</div>
-                          <div className="text-sm text-gray-500 sm:hidden">
-                            {request.designType} • {request.plotArea}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {format(new Date(request.createdAt), 'MMM dd, yyyy')}
-                          </div>
-                        </td>
-                        <td className="hidden sm:table-cell px-3 sm:px-6 py-4">
-                          <div className="text-sm text-gray-900">{request.designType}</div>
-                        </td>
-                        <td className="hidden md:table-cell px-3 sm:px-6 py-4">
-                          <div className="text-sm text-gray-900">{request.plotArea}</div>
-                        </td>
-                        <td className="px-3 sm:px-6 py-4">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(request.status)}`}>
-                            {request.status}
-                          </span>
-                        </td>
-                        <td className="px-3 sm:px-6 py-4">
-                          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
-                            <button
-                              onClick={() => openModal(request)}
-                              className="text-blue-600 hover:text-blue-900 text-sm"
-                            >
-                              View Details
-                            </button>
-                            <select
-                              value={request.status}
-                              onChange={(e) => handleStatusUpdate(request._id, e.target.value)}
-                              className="text-sm rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 w-full sm:w-auto"
-                            >
-                              <option value="pending">Pending</option>
-                              <option value="in-progress">In Progress</option>
-                              <option value="completed">Completed</option>
-                              <option value="rejected">Rejected</option>
-                            </select>
-                          </div>
-                        </td>
+                {!requests || requests.length === 0 ? (
+                  <div className="p-4 text-center text-gray-500">
+                    No design requests found
+                  </div>
+                ) : (
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Client Details
+                        </th>
+                        <th className="hidden sm:table-cell px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Design Type
+                        </th>
+                        <th className="hidden md:table-cell px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Plot Area
+                        </th>
+                        <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Actions
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {requests.map((request) => (
+                        <tr key={request._id}>
+                          <td className="px-3 sm:px-6 py-4">
+                            <div className="text-sm font-medium text-gray-900">{request.fullName}</div>
+                            <div className="text-sm text-gray-500">{request.contactNumber}</div>
+                            <div className="text-sm text-gray-500 sm:hidden">
+                              {request.designType} • {request.plotArea}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {format(new Date(request.createdAt), 'MMM dd, yyyy')}
+                            </div>
+                          </td>
+                          <td className="hidden sm:table-cell px-3 sm:px-6 py-4">
+                            <div className="text-sm text-gray-900">{request.designType}</div>
+                          </td>
+                          <td className="hidden md:table-cell px-3 sm:px-6 py-4">
+                            <div className="text-sm text-gray-900">{request.plotArea}</div>
+                          </td>
+                          <td className="px-3 sm:px-6 py-4">
+                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(request.status)}`}>
+                              {request.status}
+                            </span>
+                          </td>
+                          <td className="px-3 sm:px-6 py-4">
+                            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                              <button
+                                onClick={() => openModal(request)}
+                                className="text-blue-600 hover:text-blue-900 text-sm"
+                              >
+                                View Details
+                              </button>
+                              <select
+                                value={request.status}
+                                onChange={(e) => handleStatusUpdate(request._id, e.target.value)}
+                                className="text-sm rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 w-full sm:w-auto"
+                              >
+                                <option value="pending">Pending</option>
+                                <option value="in-progress">In Progress</option>
+                                <option value="completed">Completed</option>
+                                <option value="rejected">Rejected</option>
+                              </select>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </div>
             </div>
           </div>
