@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import apiUrl from '../../utils/apiUrl';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -19,6 +20,10 @@ const Dashboard = () => {
     fetchUserData();
   }, []);
 
+  const handleOrderHistoryClick = () => {
+    navigate('/orders');
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -30,32 +35,32 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {/* Request Design Card */}
           <Link 
             to="/request-design" 
-            className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
+            className="bg-blue-600 text-white rounded-lg shadow-sm p-5 hover:shadow-md transition-all duration-200 transform hover:-translate-y-1 hover:bg-blue-700 cursor-pointer"
           >
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Request Design</h2>
-            <p className="text-gray-600">Submit a new design request for your project</p>
+            <h2 className="text-lg font-semibold text-white mb-1.5">Request Design</h2>
+            <p className="text-blue-100 text-sm">Submit a new design request for your project</p>
           </Link>
 
           {/* Order History Card */}
           <Link 
-            to="/order-history" 
-            className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
+            to="/orders"
+            className="bg-blue-600 text-white rounded-lg shadow-sm p-5 hover:shadow-md transition-all duration-200 transform hover:-translate-y-1 hover:bg-blue-700 cursor-pointer"
           >
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Order History</h2>
-            <p className="text-gray-600">View your design request history</p>
+            <h2 className="text-lg font-semibold text-white mb-1.5">Order History</h2>
+            <p className="text-blue-100 text-sm">View your design request history</p>
           </Link>
 
           {/* Profile Card */}
           <Link 
             to="/profile" 
-            className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
+            className="bg-blue-600 text-white rounded-lg shadow-sm p-5 hover:shadow-md transition-all duration-200 transform hover:-translate-y-1 hover:bg-blue-700 cursor-pointer"
           >
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Profile</h2>
-            <p className="text-gray-600">View and manage your profile settings</p>
+            <h2 className="text-lg font-semibold text-white mb-1.5">Profile</h2>
+            <p className="text-blue-100 text-sm">View and manage your profile settings</p>
           </Link>
         </div>
 
