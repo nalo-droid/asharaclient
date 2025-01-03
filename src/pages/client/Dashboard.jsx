@@ -1,53 +1,96 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import apiUrl from '../../utils/apiUrl';
 
-function Dashboard() {
-  const user = JSON.parse(localStorage.getItem('user'));
-  const [recentOrders, setRecentOrders] = useState([]);
-  const [savedDesigns, setSavedDesigns] = useState([]);
+const Dashboard = () => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const [ordersResponse, designsResponse] = await Promise.all([
-          fetch('/api/orders/recent'),
-          fetch('/api/designs/saved')
-        ]);
-        
-        const orders = await ordersResponse.json();
-        const designs = await designsResponse.json();
-        
-        setRecentOrders(orders);
-        setSavedDesigns(designs);
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching user data:', error);
+        setError(`Unable to load dashboard data: ${error.message}`);
       }
     };
 
     fetchUserData();
   }, []);
 
-  return (
-    <div className="min-h-screen w-full bg-gray-50">
-      <div className="container-xl mx-auto py-8">
-        <div className="w-full grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {/* Stats Section */}
-          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">Overview</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* ... stats content ... */}
-            </div>
-          </div>
+  const handleOrderHistoryClick = () => {
+    navigate('/orders');
+  };
 
-          {/* Recent Orders Section */}
-          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm overflow-x-auto">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">Recent Orders</h2>
-            {/* ... orders content ... */}
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {/* Request Design Card */}
+          <Link 
+            to="/request-design" 
+            className="bg-blue-600 text-white rounded-lg shadow-sm p-5 hover:shadow-md transition-all duration-200 transform hover:-translate-y-1 hover:bg-blue-700 cursor-pointer"
+          >
+            <h2 className="text-lg font-semibold text-white mb-1.5">Request Design</h2>
+            <p className="text-blue-100 text-sm">Submit a new design request for your project</p>
+          </Link>
+
+          {/* Order History Card */}
+          <Link 
+            to="/orders"
+            className="bg-blue-600 text-white rounded-lg shadow-sm p-5 hover:shadow-md transition-all duration-200 transform hover:-translate-y-1 hover:bg-blue-700 cursor-pointer"
+          >
+            <h2 className="text-lg font-semibold text-white mb-1.5">Order History</h2>
+            <p className="text-blue-100 text-sm">View your design request history</p>
+          </Link>
+
+          {/* Profile Card */}
+          <Link 
+            to="/profile" 
+            className="bg-blue-600 text-white rounded-lg shadow-sm p-5 hover:shadow-md transition-all duration-200 transform hover:-translate-y-1 hover:bg-blue-700 cursor-pointer"
+          >
+            <h2 className="text-lg font-semibold text-white mb-1.5">Profile</h2>
+            <p className="text-blue-100 text-sm">View and manage your profile settings</p>
+          </Link>
+        </div>
+
+        {error && (
+          <div className="mt-6 bg-red-50 border border-red-200 rounded-md p-4">
+            <p className="text-red-600">{error}</p>
+          </div>
+        )}
+
+        {/* Quick Stats Section */}
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Overview</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h3 className="text-sm font-medium text-gray-500">Pending Requests</h3>
+              <p className="mt-2 text-3xl font-semibold text-gray-900">-</p>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h3 className="text-sm font-medium text-gray-500">In Progress</h3>
+              <p className="mt-2 text-3xl font-semibold text-gray-900">-</p>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h3 className="text-sm font-medium text-gray-500">Completed</h3>
+              <p className="mt-2 text-3xl font-semibold text-gray-900">-</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Dashboard;

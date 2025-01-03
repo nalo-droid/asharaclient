@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import apiUrl from '../../utils/apiUrl';
 
 const RequestDesign = () => {
@@ -15,12 +15,16 @@ const RequestDesign = () => {
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState({});
 
+  useEffect(() => {
+    console.log('RequestDesign component mounted');
+  }, []);
+
   const handleInputChange = (e) => {
+    console.log('Input changed:', e.target.name, e.target.value);
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
-    // Clear error for this field when user starts typing
     if (errors[e.target.name]) {
       setErrors({
         ...errors,
@@ -30,11 +34,11 @@ const RequestDesign = () => {
   };
 
   const handleFileChange = (e) => {
+    console.log('File changed:', e.target.name, e.target.files[0]?.name);
     setFormData({
       ...formData,
       [e.target.name]: e.target.files[0]
     });
-    // Clear error for this field when user selects a file
     if (errors[e.target.name]) {
       setErrors({
         ...errors,
@@ -45,29 +49,34 @@ const RequestDesign = () => {
 
   const validateForm = () => {
     const newErrors = {};
+    console.log('Validating form with data:', formData);
+
     if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
     if (!formData.contactNumber.trim()) newErrors.contactNumber = 'Contact number is required';
     if (!formData.plotArea) newErrors.plotArea = 'Plot area is required';
     if (!formData.designType) newErrors.designType = 'Design type is required';
     if (!formData.titleDeed) newErrors.titleDeed = 'Title deed is required';
 
+    console.log('Validation errors:', newErrors);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Submit button clicked');
     setMessage('');
     
     if (!validateForm()) {
+      console.log('Form validation failed');
       setMessage('Please fill in all required fields');
       return;
     }
 
     setLoading(true);
+    console.log('Form validation passed, proceeding with submission');
     
     try {
-      // Create FormData object to handle file uploads
       const formDataToSend = new FormData();
       formDataToSend.append('fullName', formData.fullName);
       formDataToSend.append('contactNumber', formData.contactNumber);
@@ -79,22 +88,26 @@ const RequestDesign = () => {
         formDataToSend.append('sketch', formData.sketch);
       }
 
+      const token = localStorage.getItem('token');
+      console.log('Token present:', !!token);
+      console.log('Sending request to:', `${apiUrl}/api/design-requests`);
+
       const response = await fetch(`${apiUrl}/api/design-requests`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: formDataToSend,
       });
 
+      console.log('Response status:', response.status);
       const data = await response.json();
+      console.log('Response data:', data);
 
       if (!response.ok) {
         throw new Error(data.message || 'Failed to submit design request');
       }
 
-      setMessage(data.message || 'Design request submitted successfully!');
-      // Reset form
       setFormData({
         plotArea: '',
         designType: '',
@@ -105,13 +118,21 @@ const RequestDesign = () => {
         contactNumber: ''
       });
       
-      // Reset file inputs
-      const fileInputs = document.querySelectorAll('input[type="file"]');
-      fileInputs.forEach(input => input.value = '');
+      document.querySelectorAll('input[type="file"]').forEach(input => {
+        input.value = '';
+      });
+      
+      setMessage('Design request submitted successfully!');
+      console.log('Submission successful');
+
+      setTimeout(() => {
+        console.log('Redirecting to order history...');
+        window.location.href = '/order-history';
+      }, 2000);
 
     } catch (error) {
+      console.error('Submission error:', error);
       setMessage(error.message || 'Error submitting request. Please try again.');
-      console.error('Error:', error);
     } finally {
       setLoading(false);
     }
@@ -122,7 +143,7 @@ const RequestDesign = () => {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">Request a Design</h1>
         
-        <form className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
           <div className="space-y-4 sm:space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div>

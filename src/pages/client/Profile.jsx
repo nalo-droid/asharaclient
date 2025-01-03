@@ -1,19 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import apiUrl from '../../utils/apiUrl';
 
 function Profile() {
-  const user = JSON.parse(localStorage.getItem('user'));
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const [isEditing, setIsEditing] = useState(false);
+  const [message, setMessage] = useState('');
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    phone: '',
-    company: '',
-    address: '',
+    phone: user?.phone || '',
+    company: user?.company || '',
+    address: user?.address || '',
     preferences: {
-      notifications: true,
-      newsletter: false
+      notifications: user?.preferences?.notifications ?? true,
+      newsletter: user?.preferences?.newsletter ?? false
     }
   });
+
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/users/profile`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch profile');
+      }
+
+      const data = await response.json();
+      setUser(data);
+      setFormData({
+        name: data.name || '',
+        email: data.email || '',
+        phone: data.phone || '',
+        company: data.company || '',
+        address: data.address || '',
+        preferences: {
+          notifications: data.preferences?.notifications ?? true,
+          newsletter: data.preferences?.newsletter ?? false
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      setMessage('Error loading profile data');
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -34,11 +71,31 @@ function Profile() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle profile update
-    console.log('Updated profile:', formData);
-    setIsEditing(false);
+    try {
+      const response = await fetch(`${apiUrl}/api/users/profile`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+
+      const updatedUser = await response.json();
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      setMessage('Profile updated successfully');
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setMessage('Error updating profile');
+    }
   };
 
   return (
@@ -55,6 +112,16 @@ function Profile() {
                 {isEditing ? 'Cancel' : 'Edit Profile'}
               </button>
             </div>
+
+            {message && (
+              <div className={`mb-4 p-4 rounded-md ${
+                message.includes('Error') 
+                  ? 'bg-red-50 text-red-700' 
+                  : 'bg-green-50 text-green-700'
+              }`}>
+                {message}
+              </div>
+            )}
 
             <form onSubmit={handleSubmit}>
               <div className="space-y-6">

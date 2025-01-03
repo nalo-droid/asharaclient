@@ -12,6 +12,8 @@ function AdminDashboard() {
     totalOrders: 0
   });
 
+  // console.log(stats);
+
   useEffect(() => {
     // Fetch statistics from API
     const fetchStats = async () => {
