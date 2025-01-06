@@ -49,6 +49,18 @@ const DesignCatalog = () => {
     return matchesSearch && matchesCategory;
   });
 
+  const getImageUrl = (imagePath) => {
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+    
+    if (imagePath.startsWith('/uploads')) {
+      return `${apiUrl}${imagePath}`;
+    }
+
+    return `${apiUrl}/uploads/designs/${imagePath}`;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -143,11 +155,18 @@ const DesignCatalog = () => {
         <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredDesigns.map((design) => (
             <div key={design._id} className="bg-white rounded-lg shadow-sm overflow-hidden">
-              <img
-                src={`${apiUrl}/${design.images[0]}`}
-                alt={design.name}
-                className="w-full h-48 sm:h-56 object-cover"
-              />
+              <div className="relative w-full h-48 sm:h-56">
+                <img
+                  src={design.images[0] ? getImageUrl(design.images[0]) : '/placeholder-image.jpg'}
+                  alt={design.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.log('Image failed to load:', design.images[0]);
+                    e.target.onerror = null;
+                    e.target.src = '/placeholder-image.jpg';
+                  }}
+                />
+              </div>
               <div className="p-4 sm:p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div>
