@@ -54,11 +54,7 @@ const DesignCatalog = () => {
       return imagePath;
     }
     
-    if (imagePath.startsWith('/uploads')) {
-      return `${apiUrl}${imagePath}`;
-    }
-
-    return `${apiUrl}/uploads/designs/${imagePath}`;
+    return `${apiUrl}${imagePath}`;
   };
 
   if (loading) {
@@ -161,7 +157,6 @@ const DesignCatalog = () => {
                   alt={design.name}
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    console.log('Image failed to load:', design.images[0]);
                     e.target.onerror = null;
                     e.target.src = '/placeholder-image.jpg';
                   }}
